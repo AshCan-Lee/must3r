@@ -94,7 +94,7 @@ pip install .
 cd ../..
 
 # Optional step: MUST3R relies on RoPE positional embeddings for which you can compile some cuda kernels for faster runtime.
-cd dust3r/croco/curope/
+cd dust3r/croco/models/curope/
 pip install .
 cd ../../../../
 ```
