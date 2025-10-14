@@ -167,7 +167,13 @@ def get_reconstructed_scene(outdir, viser_server, should_save_glb, model, retrie
     from a list of images, run dust3r inference, global aligner.
     then run get_3D_model_from_scene
     """
-    filelist = filelist or loaded_files.split("\n")
+    if filelist:
+        image_list = filelist
+    elif loaded_files:
+        image_list = loaded_files.split("\n")
+    else:
+        return None, None
+
     if execution_mode == "vidseq" or execution_mode == "vidslam":
         if execution_mode == "vidseq":
             local_context_size = vidseq_local_context_size
@@ -183,14 +189,14 @@ def get_reconstructed_scene(outdir, viser_server, should_save_glb, model, retrie
             scene_state_update_function = functools.partial(slam_update_scene_state, subsample, min_conf_keyframe)
         else:
             raise ValueError(f"Invalid {execution_mode=}")
-        scene = must3r_inference_video(model, device, image_size, amp, filelist, max_bs, init_num_images=2, batch_num_views=1,
+        scene = must3r_inference_video(model, device, image_size, amp, image_list, max_bs, init_num_images=2, batch_num_views=1,
                                        viser_server=viser_server, num_refinements_iterations=num_refinements_iterations,
                                        local_context_size=local_context_size, is_keyframe_function=is_keyframe_function,
                                        scene_state=scene_state, scene_state_update_function=scene_state_update_function,
                                        verbose=verbose)
     else:
         is_sequence = (execution_mode == "linseq")
-        scene = must3r_inference(model, retrieval, device, image_size, amp, filelist,
+        scene = must3r_inference(model, retrieval, device, image_size, amp, image_list,
                                  num_mem_images, max_bs, init_num_images=2, batch_num_views=1, render_once=render_once,
                                  is_sequence=is_sequence, viser_server=viser_server,
                                  num_refinements_iterations=num_refinements_iterations,
@@ -434,11 +440,18 @@ def main_demo(tmpdirname, model, retrieval, device, image_size, server_name, ser
                 outmodel = gradio.Model3D()
 
             # events
-            inputfiles.change(upload_files,
+            inputfiles.upload(upload_files,
                               inputs=[inputfiles, loaded_files, execution_mode, num_mem_images,
                                       render_once, vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile],
                               outputs=[inputfiles, loaded_files, num_mem_images, render_once,
                                        vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile])
+
+            inputfiles.delete(upload_files,
+                              inputs=[inputfiles, loaded_files, execution_mode, num_mem_images,
+                                      render_once, vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile],
+                              outputs=[inputfiles, loaded_files, num_mem_images, render_once,
+                                       vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile])
+
             if allow_local_files:
                 load_files.click(fn=load_local_files,
                                  inputs=[inputfiles, textinput, execution_mode, num_mem_images,
