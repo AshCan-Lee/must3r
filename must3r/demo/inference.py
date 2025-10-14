@@ -185,7 +185,7 @@ def must3r_inference(model, retrieval, device, image_size, amp,
         pos = [pos_start[i] for i in keyframes] + [pos_start[i] for i in not_keyframes]
         encoder_precomputed_features = (x, pos)
 
-    mem_batches = [init_num_images]
+    mem_batches = [min(init_num_images, nimgs)]
     while (sum_b := sum(mem_batches)) != max(num_mem_images, init_num_images):
         size_b = min(batch_num_views, num_mem_images - sum_b)
         mem_batches.append(size_b)
@@ -279,7 +279,7 @@ def must3r_inference_video(model, device, image_size, amp,
     filenames = filelist
     # img_ids = [torch.tensor(v) for v in range(nimgs)]
 
-    mem_batches = [init_num_images]
+    mem_batches = [min(init_num_images, nimgs)]
     while (sum_b := sum(mem_batches)) != nimgs:
         size_b = min(batch_num_views, nimgs - sum_b)
         mem_batches.append(size_b)
