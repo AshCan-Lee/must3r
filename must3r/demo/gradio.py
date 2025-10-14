@@ -451,6 +451,11 @@ def main_demo(tmpdirname, model, retrieval, device, image_size, server_name, ser
                                       render_once, vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile],
                               outputs=[inputfiles, loaded_files, num_mem_images, render_once,
                                        vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile])
+            inputfiles.clear(upload_files,
+                             inputs=[inputfiles, loaded_files, execution_mode, num_mem_images,
+                                     render_once, vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile],
+                             outputs=[inputfiles, loaded_files, num_mem_images, render_once,
+                                      vidseq_local_context_size, keyframe_interval, slam_local_context_size, slam_subsample, min_conf_keyframe, keyframe_overlap_thr, overlap_percentile])
 
             if allow_local_files:
                 load_files.click(fn=load_local_files,
